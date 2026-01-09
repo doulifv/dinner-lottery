@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🍚 晚饭抽签</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #2d3436;
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 500px;
+      padding: 30px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.2em;
+      margin-bottom: 20px;
+      color: #e17055;
+    }
+    #result {
+      min-height: 2.2em;
+      font-size: 1.6em;
+      margin: 25px 0;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      border: 2px dashed #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    button {
+      background: #0984e3;
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      font-size: 1.2em;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background 0.3s;
+      width: 100%;
+      max-width: 250px;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #74b9ff;
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+    .error {
+      color: #d63031;
+      font-weight: bold;
+    }
+    .edit-link {
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #636e72;
+    }
+    .edit-link a {
+      color: #0984e3;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍚 晚饭吃什么？</h1>
+    <div id="result">点「抽签」决定！</div>
+    <button onclick="draw()">🎲 抽签</button>
+    
+    <div class="edit-link">
+      <a href="https://github.com/yourname/dinner-lottery/edit/main/data.json" target="_blank">
+        ✏️ 点此编辑餐饮选项（需 GitHub 账号）
+      </a>
+    </div>
+  </div>
+
+  <script>
+    let meals = [];
+    let drinks = [];
+
+    // 从 data.json 加载选项
+    async function loadData() {
+      try {
+        const res = await fetch('/data.json');
+        if (!res.ok) throw new Error('无法加载 data.json');
+        const data = await res.json();
+        meals = data.meals || [];
+        drinks = data.drinks || [];
+        document.getElementById('result').textContent = '点「抽签」决定！';
+      } catch (err) {
+        console.error(err);
+        document.getElementById('result').innerHTML = 
+          '<span class="error">❌ 加载失败，请检查 data.json</span>';
+      }
+    }
+
+    function draw() {
+      const resultEl = document.getElementById('result');
+      
+      if (meals.length === 0 && drinks.length === 0) {
+        resultEl.innerHTML = '<span class="error">❌ 无任何选项</span>';
+        return;
+      }
+
+      const selected = [];
+      if (meals.length > 0) {
+        selected.push(meals[Math.floor(Math.random() * meals.length)]);
+      }
+      if (drinks.length > 0) {
+        selected.push(drinks[Math.floor(Math.random() * drinks.length)]);
+      }
+
+      resultEl.textContent = selected.join(' + ');
+      
+      // 添加简单动画效果
+      resultEl.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        resultEl.style.transform = 'scale(1)';
+      }, 200);
+    }
+
+    // 页面加载时获取数据
+    window.addEventListener('DOMContentLoaded', loadData);
+  </script>
+</body>
+</html>
